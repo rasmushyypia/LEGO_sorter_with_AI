@@ -57,7 +57,7 @@ class IDSCam():
             ueye.is_PixelClock(self.CamID,ueye.IS_PIXELCLOCK_CMD_SET, ueye.c_int(self.pixelClock), ueye.sizeof(ueye.c_int(self.pixelClock)))
             self.currentFPS = ueye.c_double(0)
             
-            #ueye.is_SetFrameRate(self.CamID, ueye.c_int(self.FPS),self.currentFPS)
+            ueye.is_SetFrameRate(self.CamID, ueye.c_int(self.FPS),self.currentFPS)
             
             ueye.is_SetDisplayMode(self.CamID,ueye.IS_SET_DM_DIB)   
             #ueye.is_SetColorMode(self.CamID,ueye.IS_CM_SENSOR_RAW8)  
@@ -185,7 +185,6 @@ class IDSCam():
         wert=ueye.c_double()
         sizeo=ueye.sizeof(wert)
         ueye.is_Exposure(self.CamID, ueye.IS_EXPOSURE_CMD_GET_EXPOSURE, wert, sizeo)
-        print(wert, sizeo)
 
     def set_autoIntTime(self):
         """ Set the exposure time to automatic mode. """

@@ -1,6 +1,6 @@
 {
 	"offset" : {
-		"2"  : 90,
+		"2" : 90,
 		"4" : 90,
 		"5" : 90,
 		"6" : 90,
@@ -28,5 +28,9 @@
 	},
 	"side_pick" : ["2", "3", "4", "5", "6", "7" ],
 	"throw" : [ "1", "11" ],
-	"distance" : 75
+	"distance" : 95,
+	"up_edge_thresh" : 75,
+	"down_edge_thresh" : 535,
+	"left_edge_thresh" : 40,
+	"right_edge_thresh" : 595
 }

@@ -5,6 +5,7 @@ import json
 from .utils import bb_intersection_over_union
 from .utils import Roi
 from os.path import join, dirname
+import copy
 
 # Visualization global variables
 font = cv2.FONT_HERSHEY_SIMPLEX
@@ -112,6 +113,9 @@ class Detector():
 
         self.x_offset = self.roi.x1
         self.y_offset = self.roi.y1
+        
+        self.last_centre = [0, 0]
+        self.same_place_count = 0
 
     def load_model(self, base_dir, model_path, confidence, iou_threshold):
 
@@ -131,6 +135,10 @@ class Detector():
         self.side_pick = json_dict["side_pick"]
         self.throw = json_dict["throw"]
         self.distance = json_dict["distance"]
+        self.up_edge_thresh  = json_dict["up_edge_thresh"]
+        self.down_edge_thresh = json_dict["down_edge_thresh"]
+        self.left_edge_thresh = json_dict["left_edge_thresh"]
+        self.right_edge_thresh = json_dict["right_edge_thresh"]
         f.close()
 
 
@@ -139,6 +147,8 @@ class Detector():
         if frame is None or len(frame) == 0:
             print("No image")
             return DetectorOutput()
+            
+        #cv2.imwrite("reuna_offset_kuva.png", frame)
 
         # Preprocess image
         frame = cv2.resize(frame, (self.size, self.size))
@@ -169,7 +179,8 @@ class Detector():
         # Save results
         for i in range(results.n):
             for j in range(len(results.xyxy[i])):
-                det = Detection().from_yolov5_output(results.xyxy[i][j], names)
+                det = Detection()
+                det.from_yolov5_output(results.xyxy[i][j], names)
                 if det.confidence > best_score:
                     best_score = det.confidence
                     index = j
@@ -184,19 +195,20 @@ class Detector():
             area = cv2.contourArea(c)
 
             # Ignore contours that are too small or too large
-            if area < 800 or area > 10000:
+            if area < 800 or area > 100000:
                 continue
 
             x, y, w, h = cv2.boundingRect(c)
             rect = cv2.minAreaRect(c)
-            angle = int(rect[2])
+            angle = int(rect[2]) + 3
             min_rect_w = rect[1][0]
             min_rect_h = rect[1][1]
 
             # Retrieve the key parameters of the rotated bounding box
-            angle_detection = Detection().from_bbox([int(x+self.angle_x_offset), int(y+self.angle_y_offset), 
-                                                     int(x+self.angle_x_offset + w), int(y+self.angle_y_offset + h)],
-                                                     "angle", 0.0)
+            angle_detection = Detection()
+            angle_detection.from_bbox([int(x+self.angle_x_offset), int(y+self.angle_y_offset), 
+                                       int(x+self.angle_x_offset + w), int(y+self.angle_y_offset + h)],
+                                       "angle", 0.0)
 
             # Convert OpenCV angle to real-world angle
             if min_rect_w < min_rect_h:
@@ -214,6 +226,8 @@ class Detector():
             # Save the angle
             angle_detection.angle = angle
             angles.append(angle_detection)
+
+        unknown = False
 
         # Get paired angles
         temp_angles = []
@@ -234,8 +248,9 @@ class Detector():
         else:
             object_count = len(detections)
 
-        # If notjing was detected ad empty or one of the angles
+        # If nothing was detected ad empty or one of the angles
         if len(detections) == 0:
+            unknown = True
             if len(angles) == 0:
                 detections.append(Detection())
             else:
@@ -245,14 +260,12 @@ class Detector():
         # Check if the part is unknown and needs to be turned around
         if detections[index].label[-1] == "u" and detections[index].label.split("_")[0] in self.throw:
             unknown = True
-        else:
-            unknown = False
 
         label = detections[index].label.split("_")[0]
         pixel_centre = detections[index].get_centre()
-        pick_point = (round(pixel_centre[X] * self.x_factor + self.x_offset, 2), 
-                      round(pixel_centre[Y] * self.y_factor + self.y_offset, 2))
-        angle = detections[index].angle
+        pick_point = [round(pixel_centre[X] * self.x_factor + self.x_offset, 2), 
+                      round(pixel_centre[Y] * self.y_factor + self.y_offset, 2)]
+        pick_angle = detections[index].angle
         
         # Check if the chosen parts has other parts close to it
         # if there are close parts then shake the parts in the area
@@ -284,7 +297,40 @@ class Detector():
 
         # Apply needed offsets
         if label in self.offsets:
-            angle += self.offsets[label]
+            pick_angle += self.offsets[label]
+        
+        print(pixel_centre)
+        if pixel_centre[Y] <= self.up_edge_thresh or pixel_centre[Y] >= self.down_edge_thresh:
+            unknown = True
+            print("Setting u flag")
+            
+        if pixel_centre[X] <= self.left_edge_thresh or pixel_centre[X] >= self.right_edge_thresh:
+            unknown = True
+            print("Setting u flag")
+        
+        if False:
+            if pick_point[Y] <= 200:
+                print("setting angle to 30")
+                side = False
+                pick_angle = -30
+        
+        if False:
+            #pick_point[Y] > 1650
+            print("setting angle to 90")
+            side = False
+            pick_angle = 90
+            pick_point[Y] = 1650
+            
+        euclidean_distance = ((pixel_centre[X] - self.last_centre[X])**2 +
+                              (pixel_centre[Y] - self.last_centre[Y])**2) ** 0.5
+        if euclidean_distance < 10:
+            self.same_place_count += 1
+            if self.same_place_count >= 20:
+                self.same_place_count = 0
+            pick_angle += 10 * self.same_place_count
+        else:
+            self.same_place_count += 0
+            self.last_centre = copy.copy(pixel_centre)
         
         # Visualize detections and angles
         if visualize:
@@ -293,9 +339,12 @@ class Detector():
                     detections[i].visualize(frame, det_color)
                 else:
                     detections[i].visualize(frame, other_color)           
-            for angle in angles_without_dets:
-                angle.visualize(frame, angle_color)
-
-        return DetectorOutput().from_values(label, pick_point, angle, object_count, unknown, side, do_shake, frame)
+            for angle_det in angles_without_dets:
+                angle_det.visualize(frame, angle_color)
+                
+        cv2.imwrite("reuna_offset_kuva.png", frame)
+        output = DetectorOutput()
+        output.from_values(label, pick_point, pick_angle, object_count, unknown, side, do_shake, frame)
+        return output
 
 
