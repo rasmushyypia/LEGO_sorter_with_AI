@@ -16,6 +16,8 @@ class Camera():
         self.roi = Roi(roi)
         self.cam.set_intTime(init_time)
 
+        self.get_image()
+
     def get_image(self):
         image = cv2.undistort(np.asarray(self.cam.capture_image()), self.mtx, self.dist, None, self.newmtx)
         return image[self.roi.y1:self.roi.y2, self.roi.x1:self.roi.x2]

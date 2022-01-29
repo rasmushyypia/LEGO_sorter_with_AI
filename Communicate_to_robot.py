@@ -1,7 +1,6 @@
 import sys
 import socket
 import select
-import time
 
 import cv2
 from os.path import join, dirname
@@ -13,7 +12,7 @@ HOST = '192.168.0.6'
 PORT = 50000
 PROJECT_PATH = dirname(__file__)
 MODEL_FOLDER = join(PROJECT_PATH, "models", "yolov5")
-MODEL_PATH = join(MODEL_FOLDER, "better_all_parts_yolov5m.pt")
+MODEL_PATH = join(MODEL_FOLDER, "extended_all_parts_yolov5m.pt")
 CALIBRATION_DATA_PATH = join(PROJECT_PATH, "src", "calibration_data.npz")
 
 class RobotCommand:
@@ -27,7 +26,6 @@ class RobotCommand:
         self.angle = 0
 
     def __str__(self) -> str:
-        #print(self.mode, self.part_count, self.label, self.side_pick, self.x, self.y, self.angle)
         return "{:d};{:d};{};{:d};{:.2f};{:.2f};{:d}\r\n;" \
             .format(self.mode, self.part_count, self.label, self.side_pick, self.x, self.y, self.angle)
 
@@ -55,7 +53,6 @@ def GenerateResponse(detector : Detector, calibrator : Calibrator) -> str:
     else:
         command.mode = 1
 
-    #cv2.imwrite("rapsakuva.png", detection.frame)
     cv2.imshow("frame", detection.frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         sys.exit(1)
@@ -94,25 +91,16 @@ if __name__ == "__main__":
                 with conn:
                     s.setblocking(0)
                     print('Connected by', addr)
-                    #last_msg_time = time.time()
                     try:
                         while True:
                             ready = select.select([conn], [], [], 5)[0]
                             if ready:
                                 data = conn.recv(32)
                                 if not data:
-                                    #if time.time() - last_msg_time > 30:
-                                    #    print("Timeout, closing connection to robot")
-                                    #    break
                                     continue
                             else:
-                                #print("random else branch")
-                                #if time.time() - last_msg_time > 30:
-                                #    print("Timeout, closing connection to robot")
-                                #    break
                                 continue
 
-                            #last_msg_time = time.time()
                             msg = data.decode("utf-8")
 
                             print("received,", msg[0])
@@ -131,7 +119,7 @@ if __name__ == "__main__":
                                 data = bytes(response, 'utf-8')
                                 print("Sending:", data)
                                 conn.sendall(data)
-                    except (KeyboardInterrupt, ConnectionAbortedError):
+                    except (KeyboardInterrupt, ConnectionAbortedError, ConnectionResetError):
                         print(f"Got Error or Interrupt, closing the connection")
                         print("Waiting for new connection, close with ctrl+C")
                         pass

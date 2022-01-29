@@ -105,17 +105,17 @@ class Detector():
         self.roi = Roi(roi)
 
         self.angle_roi = Roi(angle_image_roi)
-        self.angle_y_offset = self.angle_roi.y1
-        self.angle_x_offset = self.angle_roi.x1
 
         self.x_factor = (self.roi.x2 - self.roi.x1) / size
         self.y_factor = (self.roi.y2 - self.roi.y1) / size
 
         self.x_offset = self.roi.x1
         self.y_offset = self.roi.y1
-        
+
         self.last_centre = [0, 0]
         self.same_place_count = 0
+
+        self.camera_calibrated = False
 
     def load_model(self, base_dir, model_path, confidence, iou_threshold):
 
@@ -123,11 +123,7 @@ class Detector():
         self.model = torch.hub.load(base_dir, 'custom', path=model_path, source='local')
         self.model.conf = confidence  
         self.model.iou = iou_threshold
-        
-        # Load background image used in angle detection
-        bw_background = cv2.cvtColor(cv2.imread(BACKGROUND_IMAGE), cv2.COLOR_BGR2GRAY)
-        _, self.invert_bw = cv2.threshold(bw_background, 127, 255, cv2.THRESH_BINARY_INV)
-        
+
         # Load parameters from json file
         f = open(JSON_CONFIG)
         json_dict = json.load(f)
@@ -147,26 +143,28 @@ class Detector():
         if frame is None or len(frame) == 0:
             print("No image")
             return DetectorOutput()
-            
-        #cv2.imwrite("reuna_offset_kuva.png", frame)
 
         # Preprocess image
         frame = cv2.resize(frame, (self.size, self.size))
-        
+
         if len(frame.shape) == 2 or frame.shape[2] == 1:
             frame_gray = frame
             frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
         else:
             frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        frame_gray = frame_gray[self.angle_roi.y1:self.angle_roi.y2, self.angle_roi.x1:self.angle_roi.x2]
+        if not self.camera_calibrated:
+            _, self.bw_background = cv2.threshold(frame_gray, 250, 255, cv2.THRESH_BINARY)
+            self.invert_bw = cv2.bitwise_not(self.bw_background)
+            self.bw_background = self.bw_background / 255
+            self.bw_background = self.bw_background.astype('uint8')
+            self.camera_calibrated = True
+
+        frame_gray = np.multiply(frame_gray, self.bw_background)
+        frame_gray = np.add(frame_gray, self.invert_bw)
 
         # Create a thresholded image for angle estimation
-        _, bw = cv2.threshold(frame_gray, 100, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-        bw = np.add(bw, self.invert_bw)
-
-        if True:
-            cv2.imshow("bw", bw)
+        _, bw = cv2.threshold(frame_gray, 150, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
 
         # Do inference
         results = self.model([frame], size=self.size)
@@ -187,9 +185,13 @@ class Detector():
                 detections.append(det)
 
         # Estimate angles
-        contours, _ = cv2.findContours(bw, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+        contours, hier = cv2.findContours(bw, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
+
         angles = []
         for i, c in enumerate(contours):
+            # Remove large hole contours
+            if hier[0][i][3] == -1:
+                continue
 
             # Calculate the area of each contour
             area = cv2.contourArea(c)
@@ -206,8 +208,8 @@ class Detector():
 
             # Retrieve the key parameters of the rotated bounding box
             angle_detection = Detection()
-            angle_detection.from_bbox([int(x+self.angle_x_offset), int(y+self.angle_y_offset), 
-                                       int(x+self.angle_x_offset + w), int(y+self.angle_y_offset + h)],
+            angle_detection.from_bbox([int(x), int(y), 
+                                       int(x + w), int(y + h)],
                                        "angle", 0.0)
 
             # Convert OpenCV angle to real-world angle
@@ -266,7 +268,7 @@ class Detector():
         pick_point = [round(pixel_centre[X] * self.x_factor + self.x_offset, 2), 
                       round(pixel_centre[Y] * self.y_factor + self.y_offset, 2)]
         pick_angle = detections[index].angle
-        
+
         # Check if the chosen parts has other parts close to it
         # if there are close parts then shake the parts in the area
         do_shake = False
@@ -298,28 +300,12 @@ class Detector():
         # Apply needed offsets
         if label in self.offsets:
             pick_angle += self.offsets[label]
-        
-        print(pixel_centre)
+
         if pixel_centre[Y] <= self.up_edge_thresh or pixel_centre[Y] >= self.down_edge_thresh:
             unknown = True
-            print("Setting u flag")
             
         if pixel_centre[X] <= self.left_edge_thresh or pixel_centre[X] >= self.right_edge_thresh:
             unknown = True
-            print("Setting u flag")
-        
-        if False:
-            if pick_point[Y] <= 200:
-                print("setting angle to 30")
-                side = False
-                pick_angle = -30
-        
-        if False:
-            #pick_point[Y] > 1650
-            print("setting angle to 90")
-            side = False
-            pick_angle = 90
-            pick_point[Y] = 1650
             
         euclidean_distance = ((pixel_centre[X] - self.last_centre[X])**2 +
                               (pixel_centre[Y] - self.last_centre[Y])**2) ** 0.5
@@ -331,7 +317,7 @@ class Detector():
         else:
             self.same_place_count += 0
             self.last_centre = copy.copy(pixel_centre)
-        
+
         # Visualize detections and angles
         if visualize:
             for i in range(len(detections)):
@@ -341,8 +327,7 @@ class Detector():
                     detections[i].visualize(frame, other_color)           
             for angle_det in angles_without_dets:
                 angle_det.visualize(frame, angle_color)
-                
-        cv2.imwrite("reuna_offset_kuva.png", frame)
+
         output = DetectorOutput()
         output.from_values(label, pick_point, pick_angle, object_count, unknown, side, do_shake, frame)
         return output
