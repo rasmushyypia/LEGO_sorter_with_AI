@@ -4,6 +4,7 @@ import numpy as np
 class Calibrator():
 
     def __init__(self, calib_data_path):
+        # Loads calibartion data from the numpy file
         calib_data = np.load(calib_data_path)
         self.mtx = calib_data["mtx"]
         self.rotMat = calib_data["rotMat"]
@@ -12,6 +13,8 @@ class Calibrator():
 
     def project_point(self, centre_point):
 
+        # Project pixel coordinates to millimeter coordinates according to the
+        # camera calibration data.
         projected_point = groundProjectPoint(centre_point, self.mtx, self.rotMat, self.tvec)
         x_mm = round((projected_point[0][0]-5)*-1*10, 2)
         y_mm = round((projected_point[1][0]-1)*10, 2)

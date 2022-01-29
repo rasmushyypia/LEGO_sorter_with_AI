@@ -18,8 +18,8 @@ thickness = 1
 X = 0
 Y = 1
 
+# The JSON config file should be in the same folder with the detector code
 FILE_PATH = dirname(__file__)
-BACKGROUND_IMAGE = join(FILE_PATH, "bw.png")
 JSON_CONFIG = join(FILE_PATH, "config.json")
 
 class Detection():
@@ -153,6 +153,8 @@ class Detector():
         else:
             frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
+        # If this is the first picture taken, assume its empty backlight and
+        # save it as background calibration image
         if not self.camera_calibrated:
             _, self.bw_background = cv2.threshold(frame_gray, 250, 255, cv2.THRESH_BINARY)
             self.invert_bw = cv2.bitwise_not(self.bw_background)
@@ -160,10 +162,12 @@ class Detector():
             self.bw_background = self.bw_background.astype('uint8')
             self.camera_calibrated = True
 
+        # Apply the background calibration image to the camera image to enable
+        # angle detection in the edges of the light where intensity is lower
         frame_gray = np.multiply(frame_gray, self.bw_background)
         frame_gray = np.add(frame_gray, self.invert_bw)
 
-        # Create a thresholded image for angle estimation
+        # Threshold the gary image for angle estimation
         _, bw = cv2.threshold(frame_gray, 150, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
 
         # Do inference
@@ -301,12 +305,15 @@ class Detector():
         if label in self.offsets:
             pick_angle += self.offsets[label]
 
+        # If the found part is too close to the edges of the detection area
+        # then set it as unkonw as the detection could be invalid
         if pixel_centre[Y] <= self.up_edge_thresh or pixel_centre[Y] >= self.down_edge_thresh:
             unknown = True
-            
         if pixel_centre[X] <= self.left_edge_thresh or pixel_centre[X] >= self.right_edge_thresh:
             unknown = True
-            
+
+        # Check if the current pick point is close to previous one and 
+        # adjust the pick up angle if the point is close to last pick point
         euclidean_distance = ((pixel_centre[X] - self.last_centre[X])**2 +
                               (pixel_centre[Y] - self.last_centre[Y])**2) ** 0.5
         if euclidean_distance < 10:
@@ -328,6 +335,7 @@ class Detector():
             for angle_det in angles_without_dets:
                 angle_det.visualize(frame, angle_color)
 
+        # Generate output
         output = DetectorOutput()
         output.from_values(label, pick_point, pick_angle, object_count, unknown, side, do_shake, frame)
         return output

@@ -7,11 +7,13 @@ class Camera():
 
     def __init__(self, calib_data_path, roi=[100, 100, 740, 740], init_time = 100000):
 
+        # Loads calibartion data from the numpy file
         calib_data = np.load(calib_data_path)
         self.mtx = calib_data["mtx"]
         self.newmtx = calib_data["newmtx"]
         self.dist = calib_data["dist"]
 
+        # Initialize the camera itself
         self.cam = IDSCam()
         self.roi = Roi(roi)
         self.cam.set_intTime(init_time)
