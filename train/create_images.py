@@ -16,7 +16,8 @@ MAX_NUMBER_OF_OBJECTS = 10
 NUMBER_OF_IMAGES = 10000
 NUMBER_OF_PROCESSES = 10
 # TRAIN = True creates training images, TRAIN = False creates validation images.
-# Both are needed for the training process
+# Both are needed for the training process, so this script should be run twice:
+# once with TRAIN = True and once with TRAIN = False
 TRAIN = True
 # This variable determines how many occurances more the most reoccuring part can
 # have in comparinson to the least reoccuring part in the created images. Best
@@ -33,7 +34,7 @@ LABELS = [
           '30_a', '30_u', '31_a', '31_u', '33_a', '33_b', '34_a', '34_b', '35_a', '35_b', '36_a', '36_b', '37_a', '37_b',
           '40_a', '41_a','41_b', '41_u','61_a','63_a','69_a','70_a', '70_b','71_a', '90_a', '90_u', '91_a', '91_b', 
           '92_a', '92_u','93_a', '93_b', '93_c', '94_a', '94_b', '94_c', '94_d',
-          '101_a', '102_a', '103_a', '104_a', '105_a','106_a', '108_a','120_a', '141_a', '142_a','180_a', '180_b', 
+          '101_a', '102_a', '103_a', '104_a', '105_a','106_a', '108_a','120_a', '141_a', '142_a','180_a', '180_b',
           '181_a', '190_a', '190_b', '192_a', '192_b', '194_a', '194_b',
           '200_a', '200_b', '201_a', '201_b', '202_a', '202_b', '204_a', '204_b', '230_a', '230_b', '231_a', '232_a',
           '900_a',  '901_a', '902_a', '902_b', '903_a', '903_b',

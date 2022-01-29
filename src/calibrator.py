@@ -24,14 +24,17 @@ class Calibrator():
         # tiles from the left edge to the origo of the backlight.
         self.calibration_y_offset = -1
 
+        # Calibration chessboard tile size
+        self.chessboard_tile_size = 10
+
 
     def project_point(self, centre_point):
 
         # Project pixel coordinates to millimeter coordinates according to the
         # camera calibration data.
         projected_point = groundProjectPoint(centre_point, self.mtx, self.rotMat, self.tvec)
-        x_mm = round((projected_point[0][0]+self.calibration_x_offset)*-1*10, 2)
-        y_mm = round((projected_point[1][0]-1)*10, 2)
+        x_mm = round((projected_point[0][0]+self.calibration_x_offset)*-1*self.chessboard_tile_size, 2)
+        y_mm = round((projected_point[1][0]+self.calibration_y_offset)*self.chessboard_tile_size, 2)
         return x_mm, y_mm
 
 

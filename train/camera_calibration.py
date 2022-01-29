@@ -12,6 +12,8 @@ FILE_FOLDER = os.path.dirname(__file__)
 # Path to calibration image needs to be given.
 CALIBRATION_IMAGE = os.path.join(FILE_FOLDER, "calibration_image.png")
 
+CALIBRATION_OUTPUT_LOCATION = os.path.join(FILE_FOLDER, "..", "src", "calibration_data.npz")
+
 if __name__ == "__main__":
 
     # get calibartion image
@@ -58,7 +60,7 @@ if __name__ == "__main__":
     rotMat, _ = cv2.Rodrigues(rvecs[0])
 
     # Save calibartion results to numpy binary file
-    np.savez("calibration_data.npz", mtx=np.asarray(mtx, dtype=np.longdouble), 
+    np.savez(CALIBRATION_OUTPUT_LOCATION, mtx=np.asarray(mtx, dtype=np.longdouble), 
                                     rotMat=np.asarray(rotMat, dtype=np.longdouble), 
                                     tvec=np.asarray(tvecs[0], dtype=np.longdouble), 
                                     dist=np.asarray(dist, dtype=np.longdouble))

@@ -13,11 +13,13 @@ from src.calibrator import Calibrator
 from src.camera import Camera
 from src.detector import Detector
 
+CHECKPOINT_NAME = "extended_all_parts_yolov5m.pt"
+
 HOST = '192.168.0.6'
 PORT = 50000
 PROJECT_PATH = dirname(__file__)
-MODEL_FOLDER = join(PROJECT_PATH, "models", "yolov5")
-MODEL_PATH = join(MODEL_FOLDER, "extended_all_parts_yolov5m.pt")
+YOLOV5_FOLDER = join(PROJECT_PATH, "models", "yolov5")
+MODEL_PATH = join(PROJECT_PATH, "models", "checkpoints", CHECKPOINT_NAME)
 CALIBRATION_DATA_PATH = join(PROJECT_PATH, "src", "calibration_data.npz")
 
 class RobotCommand:
@@ -70,7 +72,7 @@ if __name__ == "__main__":
     roi = [230, 0, 2150, 1920]
     camera = Camera(CALIBRATION_DATA_PATH, roi, init_time=125000)
     detector = Detector(640, roi)
-    detector.load_model(MODEL_FOLDER, MODEL_PATH, 0.90, 0.45)
+    detector.load_model(YOLOV5_FOLDER, MODEL_PATH, 0.90, 0.45)
     calibrator = Calibrator(CALIBRATION_DATA_PATH)
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
