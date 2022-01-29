@@ -1,3 +1,8 @@
+"""
+Robot communication script
+@author: Samuli Pohjola & Eetu Manninen
+"""
+
 import sys
 import socket
 import select

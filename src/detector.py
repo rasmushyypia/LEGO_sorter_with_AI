@@ -1,3 +1,8 @@
+"""
+LEGO part detection class
+@author: Samuli Pohjola & Eetu Manninen
+"""
+
 import torch
 import cv2
 import numpy as np

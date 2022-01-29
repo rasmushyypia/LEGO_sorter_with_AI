@@ -1,3 +1,8 @@
+"""
+Utilities for LEGO sorting
+@author: Samuli Pohjola & Eetu Manninen
+"""
+
 import numpy as np
 from numpy.linalg import inv
 
