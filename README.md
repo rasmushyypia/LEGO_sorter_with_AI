@@ -60,7 +60,7 @@ The current detection network model is trained to detect 78 different LEGO parts
 
 3.	Save the new images to the repository’s train/orig_images folder
 
-4.	Use the CVAT-tool (https://github.com/openvinotoolkit/cvat) or some other tool like it to create Yolo style annotation text files for the new images. Each annotation text file should include bounding box information to the corresponding LEGO part image. The file names should match (g2_b.png and g2_b.txt). 
+4.	Use the CVAT-tool (https://github.com/openvinotoolkit/cvat) or some other tool like it to create Yolo style annotation text files for the new images. Each annotation text file should include bounding box information to the corresponding LEGO part image in format: label, x_center. y_center, width, height where the measures are in normalazed format ([0,1]). The file names should match (g2_b.png and g2_b.txt). 
 
 5.	Save the annotation text files to the repository’s train/obj_train_data folder
 
