@@ -69,7 +69,8 @@ def GenerateResponse(detector : Detector, calibrator : Calibrator) -> str:
 
 if __name__ == "__main__":
 
-    roi = [230, 0, 2150, 1920]
+#    roi = [230, 0, 2150, 1920]
+    roi = [270, 0, 2190, 1920]
     camera = Camera(CALIBRATION_DATA_PATH, roi, init_time=125000)
     detector = Detector(640, roi)
     detector.load_model(YOLOV5_FOLDER, MODEL_PATH, 0.90, 0.45)
