@@ -1,0 +1,5 @@
+The exposure time used with the uEye camera when the backlight was turned on was 60ms. 
+This exposure time was used in template image taking and actual operation.
+The training images were taken with the uEyeCockpit software.
+
+The calibration image was taken with uEyeCockpit software's automatic exposure time setting.
