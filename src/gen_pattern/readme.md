@@ -24,6 +24,13 @@ python gen_pattern.py -o c:\temp\radon_checkerboard_30.svg -a A3 --rows 14 --col
 python gen_pattern.py -o c:\temp\radon_checkerboard_30.svg -a A3 --rows 14 --columns 9 --type radon_checkerboard --square_size 30 -m 3 6 4 6 4 7
 
 python gen_pattern.py -o c:\temp\radon_checkerboard_40.svg -a A3 --rows 10 --columns 7 --type radon_checkerboard --square_size 40 -m 3 4 4 4 4 5
+
+python gen_pattern.py -o c:\temp\radon_checkerboard_A4_20_1.svg -a A4 --rows 13 --columns 9 --type radon_checkerboard --square_size 20 -m 3 5 3 6 4 5
+
+python gen_pattern.py -o c:\temp\radon_checkerboard_A4_20_2.svg -a A4 --rows 13 --columns 9 --type radon_checkerboard --square_size 20 -m 1 1 1 2 2 1
+
+python gen_pattern.py -o c:\temp\radon_checkerboard_A4_20_3.svg -a A4 --rows 13 --columns 9 --type radon_checkerboard --square_size 20 -m 6 1 7 1 7 2
+
 ``
 
 ``

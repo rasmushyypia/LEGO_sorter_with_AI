@@ -23,8 +23,12 @@ if __name__ == "__main__":
     # These numbers worked with the original camera setup but might need to
     # be changed if camera changes. Changes in these numbers also mean changes
     # in the calibrator.py.
+	#Original values:
+    #rows = 6
+    #cols = 8
     rows = 6
-    cols = 8
+    cols = 9
+
 
     # termination criteria
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
@@ -32,7 +36,7 @@ if __name__ == "__main__":
     # prepare object points
     objp = np.zeros((rows*cols,3), np.float32)
 	
-    objp[:,:2] = np.mgrid[0:rows,0:cols].T.reshape(-1,2)
+    objp[:,:2] = np.mgrid[0:cols,0:rows].T.reshape(-1,2)
     # Arrays to store object points and image points from all the images.
     objpoints = [] # 3d point in real world space
     imgpoints = [] # 2d points in image plane.
@@ -44,7 +48,7 @@ if __name__ == "__main__":
     #        print("Cont..")
     # Find the chess board corners
     #ret, corners = cv2.findChessboardCornersSB(gray, (rows,cols))
-    ret, corners = cv2.findChessboardCornersSB(gray, (rows,cols),  cv2.CALIB_CB_ADAPTIVE_THRESH | cv2.CALIB_CB_NORMALIZE_IMAGE | cv2.CALIB_CB_EXHAUSTIVE | cv2.CALIB_CB_ACCURACY | cv2.CALIB_CB_LARGER | cv2.CALIB_CB_MARKER )
+    ret, corners = cv2.findChessboardCornersSB(gray, (cols,rows), cv2.CALIB_CB_ADAPTIVE_THRESH | cv2.CALIB_CB_NORMALIZE_IMAGE | cv2.CALIB_CB_EXHAUSTIVE | cv2.CALIB_CB_ACCURACY | cv2.CALIB_CB_LARGER | cv2.CALIB_CB_MARKER )
     #ret, corners = cv2.findChessboardCornersSB(gray, (rows,cols), None,  cv2.CALIB_CB_ADAPTIVE_THRESH & cv2.CALIB_CB_NORMALIZE_IMAGE & cv2.CALIB_CB_FAST_CHECK)
     #ret, corners = cv2.findChessboardCornersSB(gray, (rows,cols), None,  cv2.CALIB_CB_ADAPTIVE_THRESH & cv2.CALIB_CB_NORMALIZE_IMAGE)
 
@@ -54,7 +58,7 @@ if __name__ == "__main__":
         corners2 = cv2.cornerSubPix(gray,corners, (11,11), (-1,-1), criteria)
         imgpoints.append(corners)
         # Draw and display the corners
-        cv2.drawChessboardCorners(img, (rows, cols), corners2, ret)
+        cv2.drawChessboardCorners(img, (cols, rows), corners2, ret)
         cv2.imshow('press q to quit or any other key to continue', img)
         if cv2.waitKey(0) & 0xFF == ord('q'):
             sys.exit(0)

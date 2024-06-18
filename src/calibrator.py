@@ -18,10 +18,12 @@ class Calibrator():
         # This number is determined by the lower edge of the detected
         # chessboard in calibration_test.py. Its the distance in chessboard
         # tiles from the lower edge to the origo of the backlight.
-        self.calibration_x_offset = -5
+        #self.calibration_x_offset = -5
+        self.calibration_x_offset = -7
 
         # Same for this number but it is the distance in chessboard
         # tiles from the left edge to the origo of the backlight.
+        #self.calibration_y_offset = -1
         self.calibration_y_offset = -1
 
         # Calibration chessboard tile size

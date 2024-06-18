@@ -71,7 +71,8 @@ if __name__ == "__main__":
 
 #    roi = [230, 0, 2150, 1920]
     roi = [270, 0, 2190, 1920]
-    camera = Camera(CALIBRATION_DATA_PATH, roi, init_time=125000)
+#    camera = Camera(CALIBRATION_DATA_PATH, roi, init_time=125000)    #Old 25mm big lens
+    camera = Camera(CALIBRATION_DATA_PATH, roi, init_time=105000)  #Lens TAU.LANZ.23.114 f=25mm f/#=16(full closed)
     detector = Detector(640, roi)
     detector.load_model(YOLOV5_FOLDER, MODEL_PATH, 0.90, 0.45)
     calibrator = Calibrator(CALIBRATION_DATA_PATH)
