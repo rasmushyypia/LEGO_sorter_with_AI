@@ -11,7 +11,7 @@ DATA_FOLDER = os.path.join(FILE_FOLDER, "data")
 # Ensure the data directory exists
 os.makedirs(DATA_FOLDER, exist_ok=True)
 
-CALIBRATION_INPUT_LOCATION = os.path.join(DATA_FOLDER, "calibration_data.npz")
+CALIBRATION_INPUT_LOCATION = os.path.join(DATA_FOLDER, "calibration_data1.npz")
 BACKGROUND_IMAGE_LOCATION = os.path.join(DATA_FOLDER, "background_image.png")
 CALIBRATION_IMAGE_LOCATION = os.path.join(DATA_FOLDER, "calibration_image.png")
 
@@ -134,7 +134,7 @@ def save_camera_info(folder, base_filename, roi, exposure_time_str):
         file.write(f"Exposure Time: {exposure_time_str}\n")
     print(f"Camera info saved as {file_path}")
 
-def save_incrementing_image(folder, base_filename, image, roi, exposure_time_str):
+def save_incrementing_image(folder, base_filename, image, roi=None, exposure_time_str=None):
     """Saves an image with an incrementing filename to avoid overwriting existing files and saves camera info."""
     i = 0
     while os.path.exists(os.path.join(folder, f"{base_filename}_{i}.png")):
@@ -144,7 +144,9 @@ def save_incrementing_image(folder, base_filename, image, roi, exposure_time_str
     file_path = os.path.join(folder, image_filename)
     cv2.imwrite(file_path, image)
     print(f"Image saved as {file_path}")
-    save_camera_info(folder, incremented_filename, roi, exposure_time_str)
+
+    if roi and exposure_time_str:
+        save_camera_info(folder, incremented_filename, roi, exposure_time_str)
 
 def process_and_display_image(image):
     """Processes and displays the image with the ROI."""
@@ -186,7 +188,8 @@ def process_and_display_image(image):
         capture_roi = False
 
     if capture_calibration:
-        save_incrementing_image(DATA_FOLDER, 'calibration_image', image, roi, exposure_time_str)
+        #save_incrementing_image(DATA_FOLDER, 'calibration_image', image, roi, exposure_time_str)
+        save_incrementing_image(DATA_FOLDER, 'calibration_image', image)
         capture_calibration = False
 
 def main_loop(camera, root):
