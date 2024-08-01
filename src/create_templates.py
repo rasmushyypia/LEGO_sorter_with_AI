@@ -18,6 +18,11 @@ def get_file_names():
     files = os.listdir(INPUT_FOLDER)
     return [file for file in files if file.endswith(".jpg")]
 
+def simplify_name(filename):
+    """Simplify the filename by removing characters up to the last dash and removing the last two number groups."""
+    # Remove characters up to the last dash
+    return filename.split('-')[-1]
+
 def create_templates():
     files = get_file_names()
 
@@ -59,9 +64,17 @@ def create_templates():
                     y2 = min(height, y + h)
 
                     template = image_gray[y1:y2, x1:x2]
-                    template_name = f"{file[:-4]}_{int(x)}_{int(y)}.jpg"
-                    cv2.imwrite(os.path.join(OUTPUT_FOLDER, template_name), template)
-                    print(f"Template saved: {template_name}")
+
+                    # Simplify the filename
+                    simplified_name = simplify_name(file)
+                
+                    # Ensure the output folder exists
+                    if not os.path.exists(OUTPUT_FOLDER):
+                        os.makedirs(OUTPUT_FOLDER)
+
+                    template_path = os.path.join(OUTPUT_FOLDER, simplified_name)
+                    cv2.imwrite(template_path, template)
+                    print(f"Template saved: {simplified_name}")
 
         except Exception as e:
             print(f"An error occurred processing file {file}: {e}")
