@@ -35,6 +35,7 @@ run `camera_gui.py`:
 - **place calibration board:** position the calibration board under the camera's field of view (fov).
 - **adjust exposure:** use the gui to adjust the exposure slider until the calibration board is clearly visible.
 - **capture calibration image:** click the "capture full image" button to save an image of the calibration board for calibration.
+![Alt text](/src/data/calibration_image.png?raw=true "Optional Title")
 
 ## step 2: calibrate the camera
 
@@ -42,6 +43,7 @@ run `camera_calibration.py`:
 
 - **calibration processing:** the script processes the calibration image, calculates the camera matrix and distortion coefficients, and saves this data for later use.
 - **note:** if the program outputs "no checkerboard found!", ensure the `chessboard_size` variable matches your calibration board and all corners are visible in the image.
+![Alt text](/src/data/calibrated_image.png?raw=true "Optional Title")
 
 ## step 3: capture roi (region of interest) image
 
@@ -99,7 +101,7 @@ run `generate_label_names.py`:
 export the labeled images:
 
 - **export:** export the labeled images in YOLO format from label-studio.
-- **unzip:** place the zip file in the `annotated_data` folder and unzip it.
+- **unzip:** place the zip file in the `data/annotated_data` folder and unzip it.
 
 run `create_templates.py`:
 
