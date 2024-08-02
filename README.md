@@ -15,7 +15,7 @@ This repository provides a comprehensive pipeline for capturing images, labeling
 - [Step 8: Generate Synthetic Images](#step-8-generate-synthetic-images)
 - [Step 9: Train the YOLO Model](#step-9-train-the-yolo-model)
 
-## overview of the system
+## Overview of the system
 
 ## Installation
 
@@ -27,7 +27,7 @@ cd lego-detection-pipeline
 pip install -r requirements.txt
 ```
 
-## step 1: capture calibration image
+## Step 1: capture calibration image
 
 run `camera_gui.py`:
 
@@ -38,7 +38,7 @@ run `camera_gui.py`:
 <img src="/media/calibration_image.png" alt="Calibration Image" width="500">
 
 
-## step 2: calibrate the camera
+## Step 2: calibrate the camera
 
 run `camera_calibration.py`:
 
@@ -46,7 +46,7 @@ run `camera_calibration.py`:
 - **note:** if the program outputs "no checkerboard found!", ensure the `chessboard_size` variable matches your calibration board and all corners are visible in the image.
 <img src="/media/calibrated_image.png" alt="Calibration Image" width="500">
 
-## step 3: capture roi (region of interest) image
+## Step 3: capture roi (region of interest) image
 
 run `camera_gui.py` again:
 
@@ -58,7 +58,7 @@ run `camera_gui.py` again:
   - click the "capture roi" button to save an image of the empty background along with roi and exposure information.
 <img src="/media/roi_image.png" alt="Calibration Image" width="500">
 
-## step 4: create lego dataset
+## Step 4: create lego dataset
 
 **Lego part id management**:
 
@@ -81,7 +81,7 @@ run `lego_dataset_creator.py` to open the graphical user interface.
   
   <img src="/media/data_generator_image.png" alt="Calibration Image" width="500">
 
-## step 5: generate label names
+## Step 5: generate label names
 
 run `generate_label_names.py`:
 
@@ -109,7 +109,7 @@ run `generate_label_names.py`:
 - **Assign Labels:** Assign the correct label to each bounding box.
 
 
-## step 7: create templates
+## Step 7: create templates
 
 export the labeled images:
 
@@ -121,7 +121,7 @@ run `create_templates.py`:
 - **template creation:** this script processes the annotated images and their corresponding labels to create template images based on the bounding boxes.
 - **output:** the templates are saved in the `data/templates` directory.
 
-## step 8: generate synthetic images
+## Step 8: generate synthetic images
 
 run `create_images.py`:
 
@@ -132,7 +132,7 @@ run `create_images.py`:
 - **image generation:** generates a specified number of training and validation images.
 - **output:** saves the synthetic images and their corresponding labels in the appropriate directories.
 
-## step 9: train the yolo model
+## Step 9: train the yolo model
 
 ### prepare for training:
 
