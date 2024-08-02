@@ -15,7 +15,6 @@ This repository provides a comprehensive pipeline for capturing images, labeling
 - [Step 9: Train the YOLO Model](#step-9-train-the-yolo-model)
 - [Step 10: Use the Trained Model for Predictions](#step-10-use-the-trained-model-for-predictions)
 - [Contributing](#contributing)
-- [License](#license)
 
 ## Installation
 
@@ -35,7 +34,8 @@ run `camera_gui.py`:
 - **place calibration board:** position the calibration board under the camera's field of view (fov).
 - **adjust exposure:** use the gui to adjust the exposure slider until the calibration board is clearly visible.
 - **capture calibration image:** click the "capture full image" button to save an image of the calibration board for calibration.
-![Alt text](/src/data/calibration_image.png?raw=true "Optional Title")
+<img src="/media/calibration_image.png" alt="Calibration Image" width="500">
+
 
 ## step 2: calibrate the camera
 
@@ -43,7 +43,7 @@ run `camera_calibration.py`:
 
 - **calibration processing:** the script processes the calibration image, calculates the camera matrix and distortion coefficients, and saves this data for later use.
 - **note:** if the program outputs "no checkerboard found!", ensure the `chessboard_size` variable matches your calibration board and all corners are visible in the image.
-![Alt text](/src/data/calibrated_image.png?raw=true "Optional Title")
+<img src="/media/calibrated_image.png" alt="Calibration Image" width="500">
 
 ## step 3: capture roi (region of interest) image
 
@@ -55,6 +55,7 @@ run `camera_gui.py` again:
   - adjust the exposure if necessary to get a clear view.
   - select the appropriate area under the backlight using the gui. example settings: `exposure: 120000; roi_size: 1550`.
   - click the "capture roi" button to save an image of the empty background along with roi and exposure information.
+<img src="/media/roi_image.png" alt="Calibration Image" width="500">
 
 ## step 4: create lego dataset (TBD)
 
@@ -67,6 +68,7 @@ run `lego_dataset_creator.py`:
   - use the "capture image (c)" button to capture images of the lego part in different orientations.
   - use the "capture weird orientation (u)" button to capture images in orientations where the lego piece might be easily mistaken for another piece.
   - images are saved with appropriate filenames in the `data/orig_images` directory.
+  <img src="/media/data_generator_image.png" alt="Calibration Image" width="500">
 
 ## step 5: generate label names
 
