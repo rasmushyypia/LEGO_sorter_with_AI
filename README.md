@@ -57,17 +57,27 @@ run `camera_gui.py` again:
   - click the "capture roi" button to save an image of the empty background along with roi and exposure information.
 <img src="/media/roi_image.png" alt="Calibration Image" width="500">
 
-## step 4: create lego dataset (TBD)
+## step 4: create lego dataset
 
-run `lego_dataset_creator.py`:
+**Lego part id management**:
 
-- **gui setup:**
-  - click "set new id (n)" to set up a new part.
-  - select the color of the lego part.
-- **capture images:**
-  - use the "capture image (c)" button to capture images of the lego part in different orientations.
-  - use the "capture weird orientation (u)" button to capture images in orientations where the lego piece might be easily mistaken for another piece.
-  - images are saved with appropriate filenames in the `data/orig_images` directory.
+`TAULegoPartIDs.xlsx` file contains the ID information for all lego parts. Ensure that each part ID is unique and consistent with this file.  
+When adding new parts, assign a new ID following the existing naming scheme and update the `TAULegoPartIDs.xlsx` file.
+
+run `lego_dataset_creator.py` to open the graphical user interface.
+
+- click **set new ID (n)** to assign a new ID to the lego part.
+- use the **select color** dropdown to choose the color of the lego part.
+
+**capture standard orientations**:
+
+- position the lego part and click **capture image (c)** to capture images from different angles.
+- the image will be saved as `<part_id>_<color>_<orientation>.jpg` in the `data/orig_images` directory.
+
+**capture unusual orientations**:
+
+- for challenging angles, click **capture weird orientation (u)** to take images that might confuse the model with other parts.
+  
   <img src="/media/data_generator_image.png" alt="Calibration Image" width="500">
 
 ## step 5: generate label names
