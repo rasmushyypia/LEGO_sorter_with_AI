@@ -3,6 +3,7 @@
 This repository provides a comprehensive pipeline for capturing images, labeling data, generating synthetic training data, and training a YOLO model to detect and sort LEGO pieces. Follow the steps outlined below to set up and use the pipeline effectively.
 
 ## Table of Contents
+- [Overview of the system](#overview-of-the-system)
 - [Installation](#installation)
 - [Step 1: Capture Calibration Image](#step-1-capture-calibration-image)
 - [Step 2: Calibrate the Camera](#step-2-calibrate-the-camera)
@@ -13,8 +14,8 @@ This repository provides a comprehensive pipeline for capturing images, labeling
 - [Step 7: Create Templates](#step-7-create-templates)
 - [Step 8: Generate Synthetic Images](#step-8-generate-synthetic-images)
 - [Step 9: Train the YOLO Model](#step-9-train-the-yolo-model)
-- [Step 10: Use the Trained Model for Predictions](#step-10-use-the-trained-model-for-predictions)
-- [Contributing](#contributing)
+
+## overview of the system
 
 ## Installation
 
@@ -136,8 +137,10 @@ run `create_images.py`:
 ### prepare for training:
 
 - **ensure data.yaml is configured correctly:** verify that `data.yaml` contains the correct paths to your training and validation datasets.
+  
 
 ### run training script:
+open `Yolo_trainer.ipynb`
 
 use the following script to train your yolo model:
 
